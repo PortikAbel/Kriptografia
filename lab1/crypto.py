@@ -18,7 +18,13 @@ def encrypt_caesar(plaintext):
 
     Add more implementation details here.
     """
-    raise NotImplementedError  # Your implementation here
+    ciphertext = ''
+    for c in plaintext:
+        if c >= 'A' and c <= 'Z':
+            ciphertext += chr((ord(c) - ord('A') + 3) % 26 + ord('A'))
+        else:
+            ciphertext += c
+    return ciphertext
 
 
 def decrypt_caesar(ciphertext):
@@ -26,7 +32,13 @@ def decrypt_caesar(ciphertext):
 
     Add more implementation details here.
     """
-    raise NotImplementedError  # Your implementation here
+    plaintext = ''
+    for c in ciphertext:
+        if c >= 'A' and c <= 'Z':
+            plaintext += chr((ord(c) - ord('A') - 3) % 26 + ord('A'))
+        else:
+            ciphertext += c
+    return plaintext
 
 
 # Vigenere Cipher
