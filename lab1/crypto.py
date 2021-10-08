@@ -9,7 +9,6 @@ SUNet: <SUNet ID>
 
 Replace this with a description of the program.
 """
-import math
 
 import utils
 
@@ -51,9 +50,14 @@ def encrypt_vigenere(plaintext, keyword):
     Add more implementation details here.
     """
     k = len(keyword)
+    i = 0
     ciphertext = ''
-    for i in range(len(plaintext)):
-        ciphertext += chr((ord(plaintext[i]) + ord(keyword[i%k]) - 2 * ord('A')) % 26 + ord('A'))
+    for c in plaintext:
+        if c.isUpper():
+            ciphertext += chr((ord(c) + ord(keyword[i]) - 2 * ord('A')) % 26 + ord('A'))
+            i = (i + 1) % k
+        else:
+            ciphertext += c
     return ciphertext
 
 
@@ -63,9 +67,14 @@ def decrypt_vigenere(ciphertext, keyword):
     Add more implementation details here.
     """
     k = len(keyword)
+    i = 0
     plaintext = ''
-    for i in range(len(ciphertext)):
-        plaintext += chr((ord(ciphertext[i]) - ord(keyword[i%k]) - 2 * ord('A')) % 26 + ord('A'))
+    for c in ciphertext:
+        if c.isUpper():
+            plaintext += chr((ord(c) - ord(keyword[i]) - 2 * ord('A')) % 26 + ord('A'))
+            i = (i + 1) % k
+        else:
+            plaintext += c
     return plaintext
 
 
@@ -150,6 +159,8 @@ def decrypt_mh(message, private_key):
     """
     raise NotImplementedError  # Your implementation here
 
+# Scytale Cipher
+
 def encrypt_scytale(plaintext, circumference):
     """Encrypt plaintext using a Scytale cipher with a circumference number.
     
@@ -204,3 +215,77 @@ def decrypt_scytale(ciphertext, circumference):
         plaintext += ''.join(whole_rows[whole_seq_nr::seq_nr])
 
     return plaintext
+
+# Railfence Cipher
+
+def encrypt_railfence(plaintext, nr_rails):
+    """Encrypt plaintext using a Railfence cipher with a rail number.
+
+    @param plaintext text to be encrypted
+    @type plaintext string
+    @param nr_rails the number of rails used at the railfence
+    @type nr_rails positive integer
+
+    @return encrypted string
+    """
+    low_rail_index = nr_rails - 1
+    step = 2*(low_rail_index)
+
+    ciphertext = plaintext[::step]
+    for rail_i in range(1, low_rail_index):
+        odd_chars = plaintext[rail_i::step]
+        even_chars = plaintext[step-rail_i::step]
+        merged_chars = [None]*(len(odd_chars)+len(even_chars))
+        merged_chars[0::2] = odd_chars
+        merged_chars[1::2] = even_chars
+        ciphertext += ''.join(merged_chars)
+    ciphertext += plaintext[low_rail_index::step]
+
+    return ciphertext
+
+def decrypt_railfence(ciphertext, nr_rails):
+    """Decrypt ciphertext using a Railfence cipher with a rail number.
+
+    @param ciphertext text to be decrypted
+    @type ciphertext string
+    @param nr_rails the number of rails used at the railfence
+    @type nr_rails positive integer
+
+    @return decrypted string
+    """
+    length = len(ciphertext)
+    segment_length = nr_rails - 1
+    step = 2 * segment_length
+    segment_nr = length // segment_length
+    back_n_forth_segment_nr = segment_nr // 2
+    truncated_segment_length = length % (segment_length * 2)
+
+    plaintext = [None]*length
+
+    processed_length = back_n_forth_segment_nr
+    if truncated_segment_length > 0:
+        processed_length += 1
+    plaintext[::step] = ciphertext[:processed_length]
+    print(plaintext)
+
+    for rail_i in range(1, segment_length):
+        if truncated_segment_length <= rail_i:
+            rail_length = 2 * back_n_forth_segment_nr
+        elif truncated_segment_length <= 2 * segment_length - rail_i:
+            rail_length = 2 * back_n_forth_segment_nr + 1
+        else:
+            rail_length = 2 * back_n_forth_segment_nr + 2
+        rail = ciphertext[processed_length:processed_length+rail_length]
+        processed_length += rail_length
+
+        odd_chars = rail[0::2]
+        even_chars = rail[1::2]
+        plaintext[rail_i::step] = odd_chars
+        print(plaintext)
+        plaintext[step-rail_i::step] = even_chars
+        print(plaintext)
+
+    plaintext[segment_length::step] = ciphertext[processed_length:]
+
+    return ''.join(plaintext)
+
