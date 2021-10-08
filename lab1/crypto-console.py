@@ -11,6 +11,7 @@ import random
 
 from crypto import (encrypt_caesar, decrypt_caesar,
                     encrypt_vigenere, decrypt_vigenere,
+                    decrypt_scytale, encrypt_scytale,
                     generate_private_key, create_public_key,
                     encrypt_mh, decrypt_mh)
 
@@ -21,7 +22,7 @@ from crypto import (encrypt_caesar, decrypt_caesar,
 
 def get_tool():
     print("* Tool *")
-    return _get_selection("(C)aesar, (V)igenere or (M)erkle-Hellman? ", "CVM")
+    return _get_selection("(C)aesar, (V)igenere, (S)cytale or (M)erkle-Hellman? ", "CVSM")
 
 
 def get_action():
@@ -94,6 +95,13 @@ def get_yes_or_no(prompt, reprompt=None):
     return choice[0] == 'Y'
 
 
+def get_integer(prompt):
+    integer = input("{} = ".format(prompt))
+    while not integer.isdigit():
+        integer = input("Please enter a integer expected. {} = ".format(prompt))
+    return int(integer)
+
+
 def clean_caesar(text):
     """Convert text to a form compatible with the preconditions imposed by Caesar cipher"""
     return text.upper()
@@ -161,6 +169,21 @@ def run_merkle_hellman():
     set_output(output)
 
 
+def run_scytale():
+    action = get_action()
+    encrypting = action == 'E'
+    data = get_input(binary=False)
+
+    print("* Transform *")
+    circumference = get_integer("circumference")
+
+    print("{}crypting {} using Scytale cipher and circumference number {}...".format('En' if encrypting else 'De', data, circumference))
+
+    output = (encrypt_scytale if encrypting else decrypt_scytale)(data, circumference)
+
+    set_output(output)
+
+
 def run_suite():
     """
     Runs a single iteration of the cryptography suite.
@@ -175,7 +198,8 @@ def run_suite():
     commands = {
         'C': run_caesar,         # Caesar Cipher
         'V': run_vigenere,       # Vigenere Cipher
-        'M': run_merkle_hellman  # Merkle-Hellman Knapsack Cryptosystem
+        'M': run_merkle_hellman, # Merkle-Hellman Knapsack Cryptosystem
+        'S': run_scytale         # Scytale Cipher
     }
     commands[tool]()
 
