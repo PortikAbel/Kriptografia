@@ -118,9 +118,11 @@ def run_caesar():
     data = clean_caesar(get_input(binary=False))
 
     print("* Transform *")
-    print("{}crypting {} using Caesar cipher...".format('En' if encrypting else 'De', data))
+    offset = get_integer("offset")
 
-    output = (encrypt_caesar if encrypting else decrypt_caesar)(data)
+    print("{}crypting {} using Caesar cipher with offset {}...".format('En' if encrypting else 'De', data, offset))
+
+    output = (encrypt_caesar if encrypting else decrypt_caesar)(data, offset)
 
     set_output(output)
 

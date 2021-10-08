@@ -14,7 +14,7 @@ import utils
 
 # Caesar Cipher
 
-def encrypt_caesar(plaintext):
+def encrypt_caesar(plaintext, offset):
     """Encrypt plaintext using a Caesar cipher.
 
     Add more implementation details here.
@@ -22,13 +22,13 @@ def encrypt_caesar(plaintext):
     ciphertext = ''
     for c in plaintext:
         if c >= 'A' and c <= 'Z':
-            ciphertext += chr((ord(c) - ord('A') + 3) % 26 + ord('A'))
+            ciphertext += chr((ord(c) - ord('A') + offset) % 26 + ord('A'))
         else:
             ciphertext += c
     return ciphertext
 
 
-def decrypt_caesar(ciphertext):
+def decrypt_caesar(ciphertext, offset):
     """Decrypt a ciphertext using a Caesar cipher.
 
     Add more implementation details here.
@@ -36,7 +36,7 @@ def decrypt_caesar(ciphertext):
     plaintext = ''
     for c in ciphertext:
         if c >= 'A' and c <= 'Z':
-            plaintext += chr((ord(c) - ord('A') - 3) % 26 + ord('A'))
+            plaintext += chr((ord(c) - ord('A') - offset) % 26 + ord('A'))
         else:
             ciphertext += c
     return plaintext
