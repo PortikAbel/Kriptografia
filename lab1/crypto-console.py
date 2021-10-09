@@ -115,7 +115,7 @@ def clean_vigenere(text):
 def run_caesar():
     action = get_action()
     encrypting = action == 'E'
-    data = clean_caesar(get_input(binary=False))
+    data = get_input(binary=False)
 
     print("* Transform *")
     offset = get_integer("offset")
@@ -130,10 +130,10 @@ def run_caesar():
 def run_vigenere():
     action = get_action()
     encrypting = action == 'E'
-    data = clean_vigenere(get_input(binary=False))
+    data = get_input(binary=False)
 
     print("* Transform *")
-    keyword = clean_vigenere(input("Keyword? "))
+    keyword = input("Keyword? ")
 
     print("{}crypting {} using Vigenere cipher and keyword {}...".format('En' if encrypting else 'De', data, keyword))
 
@@ -178,7 +178,7 @@ def run_scytale():
     data = get_input(binary=False)
 
     print("* Transform *")
-    circumference = get_integer("circumference")
+    circumference = get_integer("Circumference number")
 
     print("{}crypting {} using Scytale cipher and circumference number {}...".format('En' if encrypting else 'De', data, circumference))
 
@@ -190,16 +190,18 @@ def run_scytale():
 def run_railfence():
     action = get_action()
     encrypting = action == 'E'
-    data = get_input(binary=False)
+
+    binary = get_yes_or_no('Is input binary? ')
+    data = get_input(binary)
 
     print("* Transform *")
-    rails = get_integer("rails")
+    rails = get_integer("Number of rails")
 
-    print("{}crypting {} using Railfence cipher and rail number {}...".format('En' if encrypting else 'De', data, rails))
+    # print("{}crypting {} using Railfence cipher and rail number {}...".format('En' if encrypting else 'De', data, rails))
 
-    output = (encrypt_railfence if encrypting else decrypt_railfence)(data, rails)
+    output = (encrypt_railfence if encrypting else decrypt_railfence)(data, rails, binary)
 
-    set_output(output)
+    set_output(output, binary)
 
 
 def run_suite():

@@ -10,41 +10,51 @@ SUNet: <SUNet ID>
 Replace this with a description of the program.
 """
 
+import re
+from queue import PriorityQueue
+
 import utils
+import frequentwords as fw
 
 # Caesar Cipher
 
-def encrypt_caesar(plaintext, offset):
+def encrypt_caesar(plaintext: str, offset: int) -> str:
     """Encrypt plaintext using a Caesar cipher.
 
     Add more implementation details here.
     """
     ciphertext = ''
+    a, A = ord('a'), ord('A')
     for c in plaintext:
-        if c >= 'A' and c <= 'Z':
-            ciphertext += chr((ord(c) - ord('A') + offset) % 26 + ord('A'))
+        if c.islower():
+            ciphertext += chr((ord(c) - a + offset) % 26 + a)
+        elif c.isupper():
+            ciphertext += chr((ord(c) - A + offset) % 26 + A)
         else:
             ciphertext += c
     return ciphertext
 
 
-def decrypt_caesar(ciphertext, offset):
+def decrypt_caesar(ciphertext: str, offset: int) -> str:
     """Decrypt a ciphertext using a Caesar cipher.
 
     Add more implementation details here.
     """
     plaintext = ''
+    a, A = ord('a'), ord('A')
     for c in ciphertext:
-        if c >= 'A' and c <= 'Z':
-            plaintext += chr((ord(c) - ord('A') - offset) % 26 + ord('A'))
+        if c.islower():
+            plaintext += chr((ord(c) - a - offset) % 26 + a)
+        elif c.isupper():
+            plaintext += chr((ord(c) - A - offset) % 26 + A)
         else:
-            ciphertext += c
+            plaintext += c
     return plaintext
 
 
 # Vigenere Cipher
 
-def encrypt_vigenere(plaintext, keyword):
+def encrypt_vigenere(plaintext: str, keyword: str) -> str:
     """Encrypt plaintext using a Vigenere cipher with a keyword.
 
     Add more implementation details here.
@@ -52,16 +62,21 @@ def encrypt_vigenere(plaintext, keyword):
     k = len(keyword)
     i = 0
     ciphertext = ''
+    a, A = ord('a'), ord('A')
+    keyword = keyword.upper()
     for c in plaintext:
-        if c.isUpper():
-            ciphertext += chr((ord(c) + ord(keyword[i]) - 2 * ord('A')) % 26 + ord('A'))
+        if c.islower():
+            ciphertext += chr((ord(c) + ord(keyword[i]) - a - A) % 26 + a)
+            i = (i + 1) % k
+        elif c.isupper():
+            ciphertext += chr((ord(c) + ord(keyword[i]) - 2 * A) % 26 + A)
             i = (i + 1) % k
         else:
             ciphertext += c
     return ciphertext
 
 
-def decrypt_vigenere(ciphertext, keyword):
+def decrypt_vigenere(ciphertext: str, keyword: int) -> str:
     """Decrypt ciphertext using a Vigenere cipher with a keyword.
 
     Add more implementation details here.
@@ -69,9 +84,14 @@ def decrypt_vigenere(ciphertext, keyword):
     k = len(keyword)
     i = 0
     plaintext = ''
+    a, A = ord('a'), ord('A')
+    keyword = keyword.upper()
     for c in ciphertext:
-        if c.isUpper():
-            plaintext += chr((ord(c) - ord(keyword[i]) - 2 * ord('A')) % 26 + ord('A'))
+        if c.islower():
+            plaintext += chr((ord(c) - a - ord(keyword[i]) + A) % 26 + a)
+            i = (i + 1) % k
+        elif c.isupper():
+            plaintext += chr((ord(c) - ord(keyword[i])) % 26 + A)
             i = (i + 1) % k
         else:
             plaintext += c
@@ -161,7 +181,7 @@ def decrypt_mh(message, private_key):
 
 # Scytale Cipher
 
-def encrypt_scytale(plaintext, circumference):
+def encrypt_scytale(plaintext: str, circumference: int) -> str:
     """Encrypt plaintext using a Scytale cipher with a circumference number.
     
     We make character sequences by selecting every 'circumference'th character
@@ -180,7 +200,7 @@ def encrypt_scytale(plaintext, circumference):
         ciphertext += ''.join(plaintext[i::circumference])
     return ciphertext
 
-def decrypt_scytale(ciphertext, circumference):
+def decrypt_scytale(ciphertext: str, circumference: int) -> str:
     """Decrypt ciphertext using a Scytale cipher with a circumference number.
     
     1. Check if the length of the ciphertext is a perfect multiple of the circumference
@@ -218,7 +238,7 @@ def decrypt_scytale(ciphertext, circumference):
 
 # Railfence Cipher
 
-def encrypt_railfence(plaintext, nr_rails):
+def encrypt_railfence(plaintext: str, nr_rails: int, binary: bool) -> str:
     """Encrypt plaintext using a Railfence cipher with a rail number.
 
     @param plaintext text to be encrypted
@@ -238,12 +258,12 @@ def encrypt_railfence(plaintext, nr_rails):
         merged_chars = [None]*(len(odd_chars)+len(even_chars))
         merged_chars[0::2] = odd_chars
         merged_chars[1::2] = even_chars
-        ciphertext += ''.join(merged_chars)
+        ciphertext += (bytes(merged_chars) if binary else ''.join(merged_chars))
     ciphertext += plaintext[low_rail_index::step]
 
     return ciphertext
 
-def decrypt_railfence(ciphertext, nr_rails):
+def decrypt_railfence(ciphertext: str, nr_rails: int, binary: bool) -> str:
     """Decrypt ciphertext using a Railfence cipher with a rail number.
 
     @param ciphertext text to be decrypted
@@ -266,7 +286,6 @@ def decrypt_railfence(ciphertext, nr_rails):
     if truncated_segment_length > 0:
         processed_length += 1
     plaintext[::step] = ciphertext[:processed_length]
-    print(plaintext)
 
     for rail_i in range(1, segment_length):
         if truncated_segment_length <= rail_i:
@@ -281,11 +300,23 @@ def decrypt_railfence(ciphertext, nr_rails):
         odd_chars = rail[0::2]
         even_chars = rail[1::2]
         plaintext[rail_i::step] = odd_chars
-        print(plaintext)
         plaintext[step-rail_i::step] = even_chars
-        print(plaintext)
 
     plaintext[segment_length::step] = ciphertext[processed_length:]
 
-    return ''.join(plaintext)
+    return bytes(plaintext) if binary else ''.join(plaintext)
 
+
+def _count_frequent_words(text: str) -> int:
+    count = 0
+    for word in re.split('\W+', text):
+        if fw.is_frequent_word(word):
+            count += 1
+
+def break_vigenere(ciphertext: str, possible_keys: list[str]) -> str:
+    pqueue = PriorityQueue()
+    for key in possible_keys:
+        plaintext = decrypt_vigenere(ciphertext, key)
+        pqueue.put((-_count_frequent_words(plaintext), key))
+    _, potential_key = pqueue.get()
+    return decrypt_vigenere(ciphertext, potential_key)
