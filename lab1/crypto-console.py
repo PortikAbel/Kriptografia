@@ -8,14 +8,15 @@ by the crypto module.
 If you are a student, you shouldn't need to change anything in this file.
 """
 import random
+from re import split
 
 from crypto import (encrypt_caesar, decrypt_caesar,
                     encrypt_vigenere, decrypt_vigenere,
                     encrypt_scytale, decrypt_scytale,
                     encrypt_railfence, decrypt_railfence,
                     generate_private_key, create_public_key,
-                    encrypt_mh, decrypt_mh)
-
+                    encrypt_mh, decrypt_mh,
+                    break_vigenere)
 
 #############################
 # GENERAL CONSOLE UTILITIES #
@@ -132,12 +133,21 @@ def run_vigenere():
     encrypting = action == 'E'
     data = get_input(binary=False)
 
-    print("* Transform *")
-    keyword = input("Keyword? ")
+    if encrypting:
+        keyword = input("Keyword? ")
+        output = encrypt_vigenere(data, keyword)
+    else:
+        known_keyword = get_yes_or_no("Do you have one keyword? ")
+        if known_keyword:
+            keyword = input("Keyword? ")
+            output = decrypt_vigenere(data, keyword)
+        else:
+            print('Please give possible keywords.')
+            keywords = split('\W+', get_input())
+            output = break_vigenere(data, keywords)
 
-    print("{}crypting {} using Vigenere cipher and keyword {}...".format('En' if encrypting else 'De', data, keyword))
-
-    output = (encrypt_vigenere if encrypting else decrypt_vigenere)(data, keyword)
+    # print("* Transform *")
+    # print("{}crypting {} using Vigenere cipher and keyword {}...".format('En' if encrypting else 'De', data, keyword))
 
     set_output(output)
 

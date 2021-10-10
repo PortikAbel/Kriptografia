@@ -312,6 +312,7 @@ def _count_frequent_words(text: str) -> int:
     for word in re.split('\W+', text):
         if fw.is_frequent_word(word):
             count += 1
+    return count
 
 def break_vigenere(ciphertext: str, possible_keys: list[str]) -> str:
     pqueue = PriorityQueue()

@@ -10,7 +10,7 @@ file.close()
 
 def is_frequent_word(word):
   word = word.lower()
-  l, r = 0, len(words)
+  l, r = 0, len(words) - 1
   while l <= r:
     m = (l + r) // 2
     if word == words[m]:
