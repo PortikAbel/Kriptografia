@@ -2,7 +2,11 @@ from generators.PseudoRandomGenerator import PseudoRandomGenerator
 
 class Solitaire(PseudoRandomGenerator):
   def __init__(self, seed: list[int]) -> None:
-    self.pack = seed.copy()
+    self.seed = seed.copy()
+    self.initial_seed = seed.copy()
+
+  def reset(self) -> None:
+    self.seed = self.initial_seed.copy()
 
   def gen(self, n: int) -> bytes:
     seq = []
