@@ -1,6 +1,6 @@
 from config.config import Config
 from config.config import Config
-from util.cipher import Cipher
+from util.Cipher import Cipher
 
 if __name__ == '__main__':
   config = Config()

@@ -2,7 +2,7 @@ from generators.PseudoRandomGenerator import PseudoRandomGenerator
 
 class BlumBlumShub(PseudoRandomGenerator):
   def __init__(self, seed: int) -> None:
-    super.__init__(seed)
+    super().__init__(seed)
     self.n = 11 * 23
 
   def gen(self, n: int) -> bytearray:

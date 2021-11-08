@@ -1,4 +1,3 @@
-from _typeshed import Self
 from generators.PseudoRandomGenerator import PseudoRandomGenerator
 
 class Cipher:
@@ -6,7 +5,18 @@ class Cipher:
     self.generator = generator
     self.offset = 0
 
-  def crypting(self, message: bytearray, offset: int) -> bytearray:
+
+  def get_offset(self) -> int:
+    return self.offset
+
+
+  def encrypt(self, message: bytearray) -> bytearray:
+    length = len(message)
+    self.offset += length
+    return bytes(a ^ b for (a, b) in zip(message, self.generator.gen(length)))
+
+
+  def decrypt(self, message: bytearray, offset: int) -> bytearray:
     length = len(message)
 
     if offset == self.offset:
