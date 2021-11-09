@@ -8,36 +8,41 @@ class Solitaire(PseudoRandomGenerator):
   def reset(self) -> None:
     self.seed = self.initial_seed.copy()
 
-  def gen(self, n: int) -> bytes:
+  def gen_half(self, n: int) -> bytes:
     seq = []
-    pack_size = len(self.pack)
+    pack_size = len(self.seed)
     while len(seq) < n:
       # a)
-      w_joker = self.pack.index(53)
+      w_joker = self.seed.index(53)
       if w_joker == pack_size - 1:
-        self.pack[1], self.pack[2:] = self.pack[w_joker], self.pack[1:w_joker]
+        self.seed[1], self.seed[2:] = self.seed[w_joker], self.seed[1:w_joker]
         w_joker = 1
       else:
-        self.pack[w_joker+1], self.pack[w_joker] = self.pack[w_joker], self.pack[w_joker+1]
+        self.seed[w_joker+1], self.seed[w_joker] = self.seed[w_joker], self.seed[w_joker+1]
         w_joker += 1
       # b)
-      b_joker = self.pack.index(54)
+      b_joker = self.seed.index(54)
       if b_joker == pack_size - 2:
-        self.pack[1], self.pack[2:] = self.pack[b_joker], self.pack[1:b_joker] + self.pack[b_joker:]
+        self.seed[1], self.seed[2:] = self.seed[b_joker], self.seed[1:b_joker] + self.seed[b_joker:]
         b_joker = 1
       elif b_joker == pack_size - 1:
-        self.pack[2], self.pack[3:] = self.pack[b_joker], self.pack[2:b_joker]
+        self.seed[2], self.seed[3:] = self.seed[b_joker], self.seed[2:b_joker]
         b_joker = 2
       else:
-        self.pack[b_joker+2], self.pack[b_joker:b_joker+2] = self.pack[b_joker], self.pack[b_joker+1:b_joker+3]
+        self.seed[b_joker+2], self.seed[b_joker:b_joker+2] = self.seed[b_joker], self.seed[b_joker+1:b_joker+3]
         b_joker += 2
       # c)
       joker_1, joker_2 = min(w_joker, b_joker), max(w_joker, b_joker)
-      self.pack = self.pack[joker_2+1:] + self.pack[joker_1:joker_2+1] + self.pack[:joker_1]
+      self.seed = self.seed[joker_2+1:] + self.seed[joker_1:joker_2+1] + self.seed[:joker_1]
       # d)
-      cards_to_count = min(self.pack[-1], 53)
-      self.pack[:-1] = self.pack[cards_to_count:-1] + self.pack[:cards_to_count]
+      cards_to_count = min(self.seed[-1], 53)
+      self.seed[:-1] = self.seed[cards_to_count:-1] + self.seed[:cards_to_count]
       # e)
-      if self.pack[0] < 53:
-        seq.append(self.pack[self.pack[0]])
+      if self.seed[0] < 53:
+        seq.append(self.seed[self.seed[0]])
     return bytes(seq)
+
+  def gen(self, n: int) -> bytes:
+    seq1 = self.gen_half(n)
+    seq2 = self.gen_half(n)
+    return bytes((a & 0x0F) | ((b << 4) & 0xF0) for (a,b) in zip(seq1, seq2))
