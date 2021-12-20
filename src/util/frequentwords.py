@@ -2,7 +2,7 @@ import os
 
 words = []
 
-file = open(os.path.join(os.path.dirname(__file__), 'input/frequent_words.txt'))
+file = open(os.path.join(os.path.dirname(__file__), 'resources/frequent_words.txt'))
 for line in file:
   words.append(line.strip().lower())
 file.close()

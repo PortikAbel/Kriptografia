@@ -1,4 +1,4 @@
-from generators.PseudoRandomGenerator import PseudoRandomGenerator
+from src.generators.pseudo_random_generator import PseudoRandomGenerator
 
 class BlumBlumShub(PseudoRandomGenerator):
   def __init__(self, seed: int) -> None:

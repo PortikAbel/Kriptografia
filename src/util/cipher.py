@@ -1,4 +1,4 @@
-from generators.PseudoRandomGenerator import PseudoRandomGenerator
+from src.generators.pseudo_random_generator import PseudoRandomGenerator
 
 class Cipher:
   def __init__(self, generator: PseudoRandomGenerator) -> None:
