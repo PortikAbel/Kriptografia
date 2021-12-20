@@ -73,7 +73,7 @@ def encrypt_mh(message, public_key):
 
     @return list of ints representing encrypted bytes
     """
-    return [sum([a_i * b_i for (a_i, b_i) in zip(byte_to_bits(ord(byte)), public_key)]) for byte in message]
+    return [sum([a_i * b_i for (a_i, b_i) in zip(byte_to_bits(byte), public_key)]) for byte in message]
 
 def decrypt_mh(message, private_key):
     """Decrypt an incoming message using a private key
@@ -100,12 +100,11 @@ def decrypt_mh(message, private_key):
         c_ = (c * s) % q
         bits = []
         for w_i in reversed(w):
-            print(w_i, c_)
             if w_i <= c_:
                 bits.append(1)
                 c_ -= w_i
             else:
                 bits.append(0)
         plain.append(bits_to_byte(list(reversed(bits))))
-    return ''.join(list(map(chr, plain)))
+    return bytes(plain)
 

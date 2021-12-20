@@ -33,6 +33,6 @@ class MerkleHellmanTest(TestCase):
   def test_mh_crypting(self):
     private_key = generate_private_key()
     public_key = create_public_key(private_key)
-    p = "message"
+    p = "message".encode()
     c = encrypt_mh(p, public_key)
     self.assertEqual(p, decrypt_mh(c, private_key))
