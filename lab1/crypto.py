@@ -13,7 +13,8 @@ Replace this with a description of the program.
 import re
 from queue import PriorityQueue
 
-import utils
+from utils import coprime, byte_to_bits, bits_to_byte, modinv
+import random as rand
 import frequentwords as fw
 
 # Caesar Cipher
@@ -120,7 +121,20 @@ def generate_private_key(n=8):
 
     @return 3-tuple `(w, q, r)`, with `w` a n-tuple, and q and r ints.
     """
-    raise NotImplementedError  # Your implementation here
+    w = []
+    q = rand.randint(2, 10)
+    total = 0
+    for _ in range(n):
+        w.append(q)
+        total += q
+        q = rand.randint(total + 1, 2 * total)
+    w = tuple(w)
+
+    r = rand.randint(2, q-1)
+    while not coprime(q, r):
+        r = rand.randint(2, q-1)
+    
+    return (w, q, r)
 
 def create_public_key(private_key):
     """Create a public key corresponding to the given private key.
@@ -136,7 +150,7 @@ def create_public_key(private_key):
 
     @return n-tuple public key
     """
-    raise NotImplementedError  # Your implementation here
+    return tuple([private_key[2] * w_i % private_key[1] for w_i in private_key[0]])
 
 
 def encrypt_mh(message, public_key):
@@ -157,7 +171,7 @@ def encrypt_mh(message, public_key):
 
     @return list of ints representing encrypted bytes
     """
-    raise NotImplementedError  # Your implementation here
+    return bytes(sum([a_i * b_i for (a_i, b_i) in zip(byte_to_bits(byte), public_key)]) for byte in message)
 
 def decrypt_mh(message, private_key):
     """Decrypt an incoming message using a private key
@@ -177,7 +191,20 @@ def decrypt_mh(message, private_key):
 
     @return bytearray or str of decrypted characters
     """
-    raise NotImplementedError  # Your implementation here
+    w, q, r = private_key
+    s = modinv(r, q)
+    plain = []
+    for c in message:
+        c_ = c * s % q
+        bits = []
+        for w_i in reversed(w):
+            if w_i < c_:
+                bits.append(1)
+                c -= w_i
+            else:
+                bits.append(0)
+        plain.append(bits_to_byte(bits))
+    return bytes(plain)
 
 # Scytale Cipher
 
