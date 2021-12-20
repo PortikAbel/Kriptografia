@@ -142,9 +142,12 @@ def main():
   # register to key server with generated public key
   private_key = generate_private_key()
   public_key = create_public_key(private_key)
+  print('private and public keys generated')
   key_server_socket = connect(KEY_SERVER_PORT)
+  print('connected to key server')
   while not register_pub_key(key_server_socket, id, public_key):
     pass
+  print('public key sent to key server')
 
   if first_sender:
     # read the id of peer
@@ -154,28 +157,35 @@ def main():
     # get the public key of peer from key server
     peer_public_key = get_pub_key(key_server_socket, peer_id)
     disconnect_from_key_server(key_server_socket, id)
-    
+    print('public key of peer received from key server')
+
     # say hello to peer
     send_mh_encr(peer_socket, id_str, peer_public_key)
     if peer_id != int(recv_mh_encr(peer_socket, private_key)):
       print("Error: received id does not matches with known id.")
+    print('connected to peer with id {}'.format(peer_id))
   else:
     # get the id of peer from hello message
     peer_socket = initialize_connection(id)
     peer_id = int(recv_mh_encr(peer_socket, private_key))
+    print('peer with id {} connected'.format(peer_id))
     
     # get the public key of peer from key server
     peer_public_key = get_pub_key(key_server_socket, peer_id)
     disconnect_from_key_server(key_server_socket, id)
+    print('public key of peer received from key server')
     
     # respond to hello message
     send_mh_encr(peer_socket, id_str, peer_public_key)
 
   # make seed for solitaire
   nr_it_1 = randint(0, 64)
+  print('half solitaire key generated')
   send_mh_encr(peer_socket, str(nr_it_1), peer_public_key)
   nr_it_2 = int(recv_mh_encr(peer_socket, private_key))
+  print('half solitaire key received')
   cipher = initialize_cipher(nr_it_1 + nr_it_2)
+  print('cipher initalized')
   
   # start communication
   if first_sender:
